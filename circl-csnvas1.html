@@ -1,0 +1,160 @@
+ <!--  use external JS function
+    includ drawing on canvas
+    add clear and focus to input box
+    and move focus to next field/button
+ --> 
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<meta name="description" content="HTML tutorial">
+	<meta name="keywords" content="HTML,CSS">
+	<meta name="author" content="DORON S">
+
+    <style> 
+    .flex-container1 {
+        display: flex;
+        flex-direction: row;
+        background-color:  rgb(20, 100, 200); }
+
+    .flex-container1 > div {
+        background-color: #c0c0c0;
+        width: 500px;
+        height: 500px;
+        margin: 10px;
+        text-align: center;
+        line-height: 25px;
+        font-size: 15px;
+    </style> 
+</head> 
+
+<body> 
+
+<script src="number_to_string0,000-function.js"> </script> <!--  a file with function to transform number to formated string -->
+
+    <div class="flex-container1">
+        <div id="interact">
+            <fieldset>
+                    <legend> Enter Circle Radius you want: </legend>
+                    <input id="input_r_box" type= "number"  placeholder="Enter Radius Value..." onfocus="this.value=''"  >   <!-- refresh the input box when typing the next value -->
+                    <button type="button" id="r_confirm" > OK</button>
+
+                    <p id="msg_about_r"></p>
+                </fieldset>
+
+                <fieldset>
+                        <legend> Do you want to calculate a ball volume for this Radius? </legend>
+                        <button type="button" id="calc_vol"  > calculate volum</button>
+                        <p id="show_vol"> For <span style="color:red; font-weight:bold">R=0</span>, The Ball Volume is: <span style="color:red; font-weight:bold">0</span></p>
+                </fieldset>
+        </div>
+
+        <div  style="background-color:  rgb(20, 100, 200)" >
+            <h2> Displaying Canvas </h2>
+            <canvas id="canv_board" width="300" height="300" style="border:2px solid  rgb(10,200,400);">
+            </canvas>
+
+            <p id="r_on_cnvs"> <span style="color:yellow; font-weight:bold">   </span></p>
+
+            <button type="button" id="refresh"> Refresh</button>
+
+        </div>
+    </div>
+
+    <script>
+
+        var btn_ok_r = document.getElementById("r_confirm");
+        var btn_calc = document.getElementById("calc_vol");
+        var btn_rfrsh = document.getElementById("refresh");
+
+        var do_auto_playing_crcles = "do"; 
+        var r;
+
+        restart_auto_playing_crcles(8,1.5);
+
+        btn_ok_r.onclick = function() {
+            document.getElementById("calc_vol").focus();  //  move the focus to the next button
+            clear_canvas();
+            take_r();
+            react_to_r();
+        };
+
+        function take_r(){
+            r = document.getElementById("input_r_box").value; 
+        }
+
+        function react_to_r(){   // alert if R value cannot displyed or call circle_on _canvas
+            if (r<0){ // alert if R value is not valid
+                document.getElementById("msg_about_r").innerHTML = "R Can NOT be Below 0";
+            }
+            if ((r>=0) && (r<150)){ // call circle_on _canvas
+                document.getElementById("msg_about_r").innerHTML = "The circle displayed on the Canvas board";
+                document.getElementById("r_on_cnvs").innerHTML = "R=" +r ; 
+                do_auto_playing_crcles = "dont"
+                draw_circl(r, "yellow");
+            }
+            if (r >= 150){  // alert if R value cannot be displyed
+                document.getElementById("msg_about_r").innerHTML 
+                = "Only Circles with Radius of the range 0-149 can be displayed on the Canvas. please Re-Enter radiuse value";
+            }
+        };
+
+        function draw_circl(r,colr){
+            if ( ( r < 150 ) && (r >= 1 ) ) {    
+                var canv_var = document.getElementById("canv_board");
+                var ctx = canv_var.getContext("2d");
+                ctx.beginPath();
+                ctx.arc(150,150,r,0,2*3.14);
+                ctx.strokeStyle=colr;
+                ctx.stroke();
+            }  
+        };
+
+        function clear_canvas() {
+            var canv_var = document.getElementById("canv_board");
+            var ctx = canv_var.getContext("2d");
+            ctx.clearRect(00, 00, 301, 301);
+        }
+
+        btn_calc.onclick = function() { // calc btn
+            document.getElementById("input_r_box" ).focus();  //  focus = make the courser "jump" to the input box
+            if (r>=0) {  // calculate volume
+                var vol = (4/3) * Math.PI * Math.pow(r, 3) ;
+                vol = Math.round(vol); 
+               var vol_strng  = number_to_formated_string(vol); // Using transformation function: "number_to_string0,000-function.js" from JS file <script src="number_to_string0,000-function.js"> 
+                rsult_to_show = "For R="  + r  + " The Ball Volume is: " +  vol_strng ;  
+            }   else { 
+                    rsult_to_show ="R Can NOT be Below 0"; 
+                }
+                document.getElementById("show_vol").innerHTML = rsult_to_show;  
+        }; 
+
+        btn_rfrsh.onclick = function() { // Refresh 
+            location.reload(true);
+        };
+
+        function restart_auto_playing_crcles(r,enlarging_r_ratio) {
+            setInterval(function() {  
+                auto_playing_crcles(r,enlarging_r_ratio)
+                r = 150 - r;
+                enlarging_r_ratio = 1 / enlarging_r_ratio;
+                if (do_auto_playing_crcles === "do"){ clear_canvas()}
+            } ,5000);
+        };
+
+
+        function auto_playing_crcles(r,enlarging_r_ratio) {
+            setInterval(function(){  
+                if (do_auto_playing_crcles === "do"){
+                        draw_circl(r,"red");
+                        r = r * enlarging_r_ratio ; }
+            } , 500);
+        };
+
+    </script>
+</body>
+</html>
